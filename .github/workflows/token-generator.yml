@@ -1,4 +1,4 @@
-name: Idenfit Token Generator
+name: call-api
 
 on:
   workflow_dispatch:
@@ -10,11 +10,15 @@ jobs:
       - name: Install jq
         run: sudo apt-get install jq
 
-      - name: Get Token from Idenfit
+      - name: Call Idenfit login endpoint
         run: |
-          echo "Calling Idenfit login endpoint..."
-          RESPONSE=$(curl -s "https://integration.idenfit.com/login?username=zehraauludag@gmail.com&password=Zehra.1992")
+          echo "Calling Idenfit login endpoint with POST..."
+          RESPONSE=$(curl -s -X POST "https://integration.idenfit.com/login" \
+            -H "Content-Type: application/json" \
+            -d '{"username": "zehraauludag@gmail.com", "password": "Zehra.1992"}')
+
           echo "Full Response:"
           echo "$RESPONSE"
+
           echo "Parsed Token:"
           echo "$RESPONSE" | jq -r '.token'
