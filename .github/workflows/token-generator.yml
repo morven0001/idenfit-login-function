@@ -1,26 +1,50 @@
-name: token-generator
+const express = require("express");
+const axios = require("axios");
 
-on:
-  workflow_dispatch:
+const app = express();
+let currentToken = null;
 
-jobs:
-  get-token:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Idenfit login endpointine POST isteği gönderiliyor
-        id: login
-        run: |
-          RESPONSE=$(curl -s -D - -o /dev/null -X POST "https://integration.idenfit.com/login" \
-            -H "Content-Type: application/x-www-form-urlencoded" \
-            -d "username=zehraauludag@gmail.com&password=Zehra.1992")
+async function refreshToken() {
+  try {
+    const response = await axios.post(
+      "https://integration.idenfit.com/login?username=zehraauludag@gmail.com&password=Zehra.1992",
+      null,
+      {
+        headers: {
+          "content-type": "application/x-www-form-urlencoded",
+          from: "mobile",
+        },
+      },
+    );
+    // Token header içinde olabilir, farklı isimleri kontrol et
+    currentToken =
+      response.headers["x-auth-token"] ||
+      response.headers["token"] ||
+      response.headers["authorization"];
 
-          TOKEN=$(echo "$RESPONSE" | grep -i "authorization:" | cut -d' ' -f2-)
-          
-          echo "Authorization header değeri (logda gizlenebilir): $TOKEN"
+    console.log("Token refreshed:", currentToken);
+  } catch (error) {
+    console.error("Token refresh error:", error.message);
+  }
+}
 
-          echo "$TOKEN" > token.txt
+// Uygulama açılır açılmaz token yenile
+refreshToken();
 
-      - name: Token dosyasını oku ve göster
-        run: |
-          echo "token.txt içeriği aşağıda:"
-          cat token.txt
+// Her 10 dakikada (600000 ms) bir token yenile
+setInterval(refreshToken, 600000);
+
+// /token endpoint'i token bilgisini JSON olarak döner
+app.get("/token", (req, res) => {
+  if (currentToken) {
+    res.json({ token: currentToken });
+  } else {
+    res.status(503).json({ error: "Token not available yet" });
+  }
+});
+
+// Port ayarı (Replit ve benzeri ortamlar için port'u env'den al)
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
