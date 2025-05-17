@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Idenfit Token Kullanımı</title>
+    <script>
+        async function getToken() {
+            // Verdiğiniz URL ile token alıyoruz
+            const response = await fetch("https://integration.idenfit.com/login?username=zehraauludag@gmail.com&password=Zehra.1992");
+            const data = await response.json();
+            
+            // Token'ı ekranda gösteriyoruz
+            document.getElementById("token").innerText = "Token: " + data.token;
+            
+            // Token ile bir API'ye istek yapıyoruz (örnek)
+            fetch("https://integration.idenfit.com/api/v1/bilgiler", {
+                headers: {
+                    "Authorization": "Bearer " + data.token
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log("API Yanıtı:", data);
+                document.getElementById("api-response").innerText = JSON.stringify(data, null, 2);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Idenfit Token Alma Sayfası</h1>
+    <button onclick="getToken()">Token Al</button>
+    <div id="token" style="margin: 20px; padding: 10px; background: #f0f0f0;"></div>
+    <pre id="api-response" style="background: #eee; padding: 10px;"></pre>
+</body>
+</html>
