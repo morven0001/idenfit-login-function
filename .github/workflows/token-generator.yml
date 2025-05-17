@@ -20,7 +20,7 @@ jobs:
         echo "Tüm headerlar:"
         echo "$RESPONSE"
 
-        TOKEN=$(echo "$RESPONSE" | grep -i "authorization:" | awk '{print $2}')
+        TOKEN=$(echo "$RESPONSE" | grep -i "authorization:" | cut -d' ' -f2-)
         echo "Aldığım Token: $TOKEN"
           TOKEN=$(echo "$RESPONSE" | grep -i "Authorization:" | awk '{print $2}')
 
