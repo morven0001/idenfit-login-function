@@ -1,18 +1,23 @@
 name: Get Idenfit Token
 
 on:
-  workflow_dispatch:  # Manuel tetikleme için
+  workflow_dispatch:
 
 jobs:
   get-token:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Idenfit login endpointine POST isteği gönderiliyor (header + body)
+      - name: Idenfit login endpointine POST isteği gönder
         run: |
-          curl -i -X POST "https://integration.idenfit.com/login" \
-          -H "Content-Type: application/x-www-form-urlencoded" \
-          -d "username=zehraauludag@gmail.com&password=Zehra.1992" > full_response.txt
+          RESPONSE_HEADERS=$(curl -s -D - -o /dev/null -X POST "https://integration.idenfit.com/login" \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            -d "username=zehraauludag@gmail.com&password=Zehra.1992")
 
-      - name: full_response.txt içeriğini göster
-        run: cat full_response.txt
+          echo "Tüm Headerlar:"
+          echo "$RESPONSE_HEADERS"
+
+          TOKEN=$(echo "$RESPONSE_HEADERS" | grep -i "^refresh-token:" | awk '{print $2}' | tr -d '\r')
+
+          echo "Bulunan Token (refresh-token header): $TOKEN"
+
+          echo "token=$TOKEN" >> $GITHUB_OUTPUT
