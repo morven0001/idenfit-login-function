@@ -4,8 +4,8 @@ async function getToken() {
   try {
     const response = await axios.get('https://integration.idenfit.com/login', {
       params: {
-        username: process.env.IDENFIT_USERNAME,
-        password: process.env.IDENFIT_PASSWORD
+        username: process.env.IDENFIT_USER,
+        password: process.env.IDENFIT_PASS
       }
     });
     return response.data.token;
