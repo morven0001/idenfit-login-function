@@ -1,0 +1,12 @@
+name: Idenfit Token Generator
+
+on:
+  workflow_dispatch:
+
+jobs:
+  call-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: API Request
+        run: |
+          curl -X GET "https://integration.idenfit.com/login?username=zehraauludag@gmail.com&password=Zehra.1992"
