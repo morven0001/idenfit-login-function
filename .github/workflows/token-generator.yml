@@ -1,28 +1,25 @@
 name: call-api
 
+
 on:
-  workflow_dispatch:  # manuel tetikleme için
-  schedule:
-    - cron: '*/30 * * * *' # 30 dakikada bir çalışır, istersen değiştirebilirsin
+  workflow_dispatch:
 
 jobs:
   get-token:
     runs-on: ubuntu-latest
-
+    outputs:
+      token: ${{ steps.login.outputs.token }}
     steps:
-    - name: Token alma denemesi
-      run: |
-        echo "Idenfit login endpointine POST isteği gönderiliyor..."
-        RESPONSE=$(curl -s -D - -o /dev/null -X POST "https://integration.idenfit.com/login" \
-          -H "Content-Type: application/x-www-form-urlencoded" \
-          -d "username=zehraauludag@gmail.com&password=Zehra.1992")
-        
-        echo "Tüm headerlar:"
-        echo "$RESPONSE"
-
-        TOKEN=$(echo "$RESPONSE" | grep -i "authorization:" | cut -d' ' -f2-)
-        echo "Aldığım Token: $TOKEN"
-          TOKEN=$(echo "$RESPONSE" | grep -i "Authorization:" | awk '{print $2}')
-
-          echo "Parsed Token:"
-          echo "$TOKEN"
+      - name: Idenfit login endpointine POST isteği gönderiliyor
+        id: login
+        run: |
+          RESPONSE=$(curl -s -D - -o /dev/null -X POST "https://integration.idenfit.com/login" \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            -d "username=zehraauludag@gmail.com&password=Zehra.1992")
+          
+          TOKEN=$(echo "$RESPONSE" | grep -i "authorization:" | cut -d' ' -f2-)
+          
+          echo "Authorization header değeri: $TOKEN"
+          
+          # Token'ı GitHub Action çıktısı olarak ayarla
+          echo "token=$TOKEN" >> $GITHUB_OUTPUT
