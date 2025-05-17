@@ -21,8 +21,8 @@ jobs:
       - name: Get Token
         id: get-token
         env:
-          USERNAME: ${{ secrets.USERNAME }}
-          PASSWORD: ${{ secrets.PASSWORD }}
+          USERNAME: ${{ secrets.IDENFIT_USERNAME }}
+          PASSWORD: ${{ secrets.IDENFIT_PASSWORD}}
         run: |
           TOKEN=$(node -e "const getToken = require('./get-token.js'); getToken().then(console.log).catch(console.error)")
           echo "::set-output name=token::$TOKEN"
