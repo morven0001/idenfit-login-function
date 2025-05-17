@@ -1,13 +1,17 @@
-name: Get Idenfit Token
+name: Get Idenfit Token and Send to Logic Apps
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # İstersen manuel tetikleme için
+  schedule:          # Otomatik her 15 dakikada 1 çalışsın diye (isteğe bağlı)
+    - cron: '*/15 * * * *'
 
 jobs:
   get-token:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Idenfit login endpointine POST isteği gönder
+      - name: Idenfit login endpointine POST isteği gönderiliyor
+        id: get_token
         run: |
           RESPONSE_HEADERS=$(curl -s -D - -o /dev/null -X POST "https://integration.idenfit.com/login" \
             -H "Content-Type: application/x-www-form-urlencoded" \
@@ -18,6 +22,17 @@ jobs:
 
           TOKEN=$(echo "$RESPONSE_HEADERS" | grep -i "^refresh-token:" | awk '{print $2}' | tr -d '\r')
 
-          echo "Bulunan Token (refresh-token header): $TOKEN"
+          echo "Bulunan Token: $TOKEN"
 
-          echo "token=$TOKEN" >> $GITHUB_OUTPUT
+          # Token'ı GitHub Actions output olarak ayarla
+          echo "::set-output name=token::$TOKEN"
+
+      - name: Token'ı Logic Apps URL'sine POST et
+        run: |
+          LOGIC_APPS_URL="https://prod-105.westeurope.logic.azure.com:443/workflows/eeba067314d9496993368d8d9df81730/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ddjnu7xuAqnFuweilT_exxHGT4tDNJd4Xkh5Ua-oh5c"
+
+          curl -X POST "$LOGIC_APPS_URL" \
+            -H "Content-Type: application/json" \
+            -d "{\"token\":\"${{ steps.get_token.outputs.token }}\"}"
+
+          echo "Token Logic Apps URL'sine gönderildi."
