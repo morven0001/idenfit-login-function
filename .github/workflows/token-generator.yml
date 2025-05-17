@@ -1,23 +1,27 @@
 name: call-api
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # manuel tetikleme için
+  schedule:
+    - cron: '*/30 * * * *' # 30 dakikada bir çalışır, istersen değiştirebilirsin
 
 jobs:
-  call-api:
+  get-token:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Call Idenfit login endpoint and extract token from headers
-        run: |
-          echo "Calling Idenfit login endpoint with POST..."
+    - name: Token alma denemesi
+      run: |
+        echo "Idenfit login endpointine POST isteği gönderiliyor..."
+        RESPONSE=$(curl -s -D - -o /dev/null -X POST "https://integration.idenfit.com/login" \
+          -H "Content-Type: application/x-www-form-urlencoded" \
+          -d "username=zehraauludag@gmail.com&password=Zehra.1992")
+        
+        echo "Tüm headerlar:"
+        echo "$RESPONSE"
 
-          RESPONSE=$(curl -s -D - -o /dev/null -X POST "https://integration.idenfit.com/login" \
-            -H "Content-Type: application/x-www-form-urlencoded" \
-            -d "username=zehraauludag@gmail.com&password=Zehra.1992")
-
-          echo "Full Response Headers:"
-          echo "$RESPONSE"
-
+        TOKEN=$(echo "$RESPONSE" | grep -i "authorization:" | awk '{print $2}')
+        echo "Aldığım Token: $TOKEN"
           TOKEN=$(echo "$RESPONSE" | grep -i "Authorization:" | awk '{print $2}')
 
           echo "Parsed Token:"
