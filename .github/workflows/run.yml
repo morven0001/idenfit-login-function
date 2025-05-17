@@ -1,9 +1,9 @@
 name: Get Idenfit Token and Send to Logic Apps
 
 on:
-  workflow_dispatch:  # İstersen manuel tetikleme için
-  schedule:          # Otomatik her 15 dakikada 1 çalışsın diye (isteğe bağlı)
-    - cron: '*/15 * * * *'
+  workflow_dispatch:
+  schedule:
+    - cron: '*/15 * * * *'  # 15 dakikada 1 otomatik tetikleme
 
 jobs:
   get-token:
@@ -24,7 +24,6 @@ jobs:
 
           echo "Bulunan Token: $TOKEN"
 
-          # Token'ı GitHub Actions output olarak ayarla
           echo "::set-output name=token::$TOKEN"
 
       - name: Token'ı Logic Apps URL'sine POST et
