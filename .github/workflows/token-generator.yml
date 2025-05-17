@@ -7,6 +7,14 @@ jobs:
   call-api:
     runs-on: ubuntu-latest
     steps:
-      - name: API Request
+      - name: Install jq
+        run: sudo apt-get install jq
+
+      - name: Get Token from Idenfit
         run: |
-          curl -X GET "https://integration.idenfit.com/login?username=zehraauludag@gmail.com&password=Zehra.1992"
+          echo "Calling Idenfit login endpoint..."
+          RESPONSE=$(curl -s "https://integration.idenfit.com/login?username=zehraauludag@gmail.com&password=Zehra.1992")
+          echo "Full Response:"
+          echo "$RESPONSE"
+          echo "Parsed Token:"
+          echo "$RESPONSE" | jq -r '.token'
