@@ -13,7 +13,7 @@ jobs:
       - name: Call Idenfit login endpoint
         run: |
           echo "Calling Idenfit login endpoint with POST..."
-          RESPONSE=$(curl -s -X POST "https://integration.idenfit.com/login" \
+          RESPONSE=$(curl -s -D - -o /dev/null -X POST "https://integration.idenfit.com/login" \
             -H "Content-Type: application/x-www-form-urlencoded" \
             -d '{"username": "zehraauludag@gmail.com", "password": "Zehra.1992"}')
 
