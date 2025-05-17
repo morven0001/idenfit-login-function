@@ -1,4 +1,5 @@
-name:call
+name: token-generator
+
 on:
   workflow_dispatch:
 
