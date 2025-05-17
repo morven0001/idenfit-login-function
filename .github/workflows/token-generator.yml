@@ -1,4 +1,4 @@
-name: call-api
+
 on:
   workflow_dispatch:
 
@@ -15,11 +15,11 @@ jobs:
 
           TOKEN=$(echo "$RESPONSE" | grep -i "authorization:" | cut -d' ' -f2-)
           
-          echo "Authorization header değeri: $TOKEN"
+          echo "Authorization header değeri (logda gizlenebilir): $TOKEN"
 
-          # Token'ı bir dosyaya yaz
           echo "$TOKEN" > token.txt
 
-      - name: Token dosyasını oku
+      - name: Token dosyasını oku ve göster
         run: |
+          echo "token.txt içeriği aşağıda:"
           cat token.txt
