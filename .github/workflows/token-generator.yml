@@ -1,14 +1,10 @@
 name: call-api
-
-
 on:
   workflow_dispatch:
 
 jobs:
   get-token:
     runs-on: ubuntu-latest
-    outputs:
-      token: ${{ steps.login.outputs.token }}
     steps:
       - name: Idenfit login endpointine POST isteği gönderiliyor
         id: login
@@ -16,10 +12,14 @@ jobs:
           RESPONSE=$(curl -s -D - -o /dev/null -X POST "https://integration.idenfit.com/login" \
             -H "Content-Type: application/x-www-form-urlencoded" \
             -d "username=zehraauludag@gmail.com&password=Zehra.1992")
-          
+
           TOKEN=$(echo "$RESPONSE" | grep -i "authorization:" | cut -d' ' -f2-)
           
           echo "Authorization header değeri: $TOKEN"
-          
-          # Token'ı GitHub Action çıktısı olarak ayarla
-          echo "token=$TOKEN" >> $GITHUB_OUTPUT
+
+          # Token'ı bir dosyaya yaz
+          echo "$TOKEN" > token.txt
+
+      - name: Token dosyasını oku
+        run: |
+          cat token.txt
