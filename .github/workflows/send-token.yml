@@ -1,0 +1,35 @@
+name: Send Token to Power Automate
+on:
+  workflow_dispatch: # Manuel tetikleme için
+  schedule:
+    - cron: '0 * * * *' # Her saat başı
+
+jobs:
+  send-token:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      
+      - name: Install dependencies
+        run: npm install axios
+      
+      - name: Get Token
+        id: get-token
+        env:
+          IDENFIT_USER: ${{ secrets.IDENFIT_USER }}
+          IDENFIT_PASS: ${{ secrets.IDENFIT_PASS }}
+        run: |
+          TOKEN=$(node -e "const { getToken } = require('./action.js'); getToken().then(console.log).catch(() => process.exit(1))")
+          echo "::set-output name=token::$TOKEN"
+      
+      - name: Send to Power Automate
+        run: |
+          curl -X POST \
+          "${{ secrets.POWER_AUTOMATE_URL }}" \
+          -H "Content-Type: application/json" \
+          -d "{\"token\":\"${{ steps.get-token.outputs.token }}\""
